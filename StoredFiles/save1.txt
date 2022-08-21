@@ -1,0 +1,54 @@
+DIRECTORIES:
+{
+    0
+    idiot
+    Main
+}
+{
+    1
+    stupid
+    Main
+}
+{
+    2
+    documents
+    Main
+}
+FILES:
+{
+    3
+    Hello.txt
+    Main
+    c======
+    Hello World!
+    
+    no for real
+    12345
+}
+{
+    4
+    square.img
+    Main
+    c======
+    AAAA;
+    A00A;
+    A00A;
+    AAAA;
+}
+{
+    5
+    ha.txt
+    Mainstupid
+    c======
+    hahahahhahahahahahahhaha
+}
+{
+    6
+    test.cod
+    Main
+    c======
+    var text = "Hello World!"
+    while true
+      out text
+    ;
+}
