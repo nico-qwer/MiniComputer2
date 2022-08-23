@@ -10,9 +10,7 @@ namespace MiniComputer2
         public List<Directory> directories = new List<Directory>();
         public List<File> files = new List<File>();
 
-        public int ID;
-
-        public static Directory? CreateDirectory(string dirName, Directory[] newPath, int newID = -1)
+        public static Directory? CreateDirectory(string dirName, Directory[] newPath)
         {
             if (dirName == null || dirName == "") { Globals.WriteError("Cannot create directory with no name."); return null; }
             if (dirName.Contains("+")) { Globals.WriteError("Invalid directory name."); return null; }
@@ -20,25 +18,15 @@ namespace MiniComputer2
             if (Globals.currentPath.Last().FindFileInChildren(dirName) != null) { Globals.WriteError("Name is already used."); return null; }
             if (Globals.currentPath.Last().FindDirectoryInChildren(dirName) != null) { Globals.WriteError("Name is already used."); return null; }
 
-            Directory newDir = new Directory(dirName, Globals.currentPath, newID);
+            Directory newDir = new Directory(dirName, Globals.currentPath);
 
             return newDir;
         }
 
-        public Directory(string newName, Directory[] newPath, int newID)
+        public Directory(string newName, Directory[] newPath)
         {
             Rename(newName);
             path = newPath;
-
-            if (newID == -1)
-            {
-                ID = Item.currentID;
-                Item.currentID++;
-            }
-            else
-            {
-                ID = newID;
-            }
 
             if (newName == Globals.rootDirName) return;
 

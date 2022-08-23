@@ -7,30 +7,19 @@ namespace MiniComputer2
 
         public List<string> content = new List<string>() { "" };
         public string type;
-        public int ID;
 
-        public static File? CreateFile(string fileName, Directory[] newPath, int newID = -1)
+        public static File? CreateFile(string fileName, Directory[] newPath)
         {
-            File newFile = new File(fileName, newPath, newID);
+            File newFile = new File(fileName, newPath);
             return newFile;
         }
 
-        public File(string newName, Directory[] newPath, int newID)
+        public File(string newName, Directory[] newPath)
         {
             this.Rename(newName);
             path = newPath;
 
-            if (newID == -1)
-            {
-                ID = currentID;
-                currentID++;
-            }
-            else
-            {
-                ID = newID;
-            }
-
-            if (name == null) { name = ID.ToString(); }
+            if (name == null) { name = Globals.RandomString(10); }
             if (type == null) { type = "txt"; }
 
             allFiles.Add(this);

@@ -14,11 +14,40 @@ namespace MiniComputer2
 
             WriteLine("\n==================== Booted! ====================\n");
 
-            WriteLine("Press any key to create save file...");
-            ReadKey();
-            SaveSystem.Dump("save1");
+            while (true)
+            {
+                Write($"<{FormatPath(Globals.currentPath)}>: ");
+                string? input = ReadLine();
+                if (string.IsNullOrWhiteSpace(input)) continue;
 
-            ReadKey();
+                string command = input.Split(" ")[0];
+                string[] arguments = input.Split(" ").Skip(1).ToArray();
+                if (arguments == null)
+                {
+                    arguments = new string[0];
+                }
+
+                if (command == "quit") break;
+
+                SearchProgram(command, arguments);
+            }
+        }
+
+        static void SearchProgram(string name, string[] arguments)
+        {
+            for (int i = 0; i < Globals.programsDirectory.files.Count(); i++)
+            {
+                if (Globals.programsDirectory.files[i].name == name) continue;
+                if (Globals.programsDirectory.files[i].type != "exe") Interpreter.Run(Globals.programsDirectory.files[i], arguments);
+                return;
+            }
+            Directory currentDir = Globals.currentPath.Last();
+            for (int i = 0; i < currentDir.files.Count(); i++)
+            {
+                if (currentDir.files[i].name == name) continue;
+                if (currentDir.files[i].type != "exe") Interpreter.Run(currentDir.files[i], arguments);
+                return;
+            }
         }
 
 

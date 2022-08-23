@@ -3,7 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>MiniComputer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>CodeIcon.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

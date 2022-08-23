@@ -1,54 +1,31 @@
 DIRECTORIES:
 {
-    0
-    idiot
+    Documents
     Main
-}
-{
-    1
-    stupid
-    Main
-}
-{
-    2
-    documents
-    Main
-}
+END}
 FILES:
 {
-    3
-    Hello.txt
-    Main
+    STDIO.cod
+    Main/Programs
     c======
-    Hello World!
+END}
+{
+    save.exe
+    Main/Programs
+    c======
     
-    no for real
-    12345
-}
+END}
 {
-    4
-    square.img
-    Main
+    smth.txt
+    Main/Documents
     c======
-    AAAA;
-    A00A;
-    A00A;
-    AAAA;
-}
+    Hey
+END}
 {
-    5
-    ha.txt
-    Mainstupid
+    HelloWorld.txt
+    Main/Documents
     c======
-    hahahahhahahahahahahhaha
-}
-{
-    6
-    test.cod
-    Main
-    c======
-    var text = "Hello World!"
-    while true
-      out text
-    ;
-}
+    how are you doing fellow world?
+    
+    I am doing well fellow human
+END}
