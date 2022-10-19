@@ -5,177 +5,141 @@ namespace MiniComputer2
 {
     class Interpreter
     {
-        public static void Run(File toRun, string[] arguments)
+        public static int Run(File code, string[] arguments)
         {
-            string[]? code = PreProcess(toRun.content);
-            if (code == null) return;
-
-            Function[]? functions = DetectFunctions(code);
-            if (functions == null) return;
+            string[] formattedFile = FormatCode(code);
 
             List<Variable> variables = new List<Variable>();
 
-            for (int i = 0; i < code.Length; i++)
+            for (int i = 0; i < formattedFile.Length; i++)
             {
-                if (code[i].StartsWith("var"))
+                string[] tokens = formattedFile[i].Split(" ");
+
+                switch (tokens[0])
                 {
-                    string[] tokens = code[i].Split(" ");
+                    case "var":
 
-                    if (tokens.Length < 5) { Globals.WriteError($"Line {i.ToString()}: Variable declaration incorrect."); return; }
+                        if (tokens[3] != "=" || tokens.Length < 5) { Globals.WriteError($"\"{formattedFile[i]}\" at line {i}: variable assignment not valid."); return 1; }
 
-                    string name = tokens[2];
+                        Variable? newVar = CreateVariable(tokens);
+                        if (newVar == null) { Globals.WriteError($"\"{formattedFile[i]}\" at line {i}: variable assignment not valid."); return 1; }
 
-                    if (Enum.TryParse(tokens[1], out varType newType) == false)
-                    {
-                        Globals.WriteError($"Line {i.ToString()}: Variable type incorrect.");
-                        return;
-                    }
+                        variables.Add(newVar);
+                        break;
 
-                    if (name.Contains("/") | name.Contains("(") | name.Contains(")") | name.Contains(".") | name.Contains(","))
-                    {
-                        Globals.WriteError($"Line {i.ToString()}: Variable name cannot contain /().,");
-                        return;
-                    }
+                    default:
 
-                    if (tokens[3] != "=") { Globals.WriteError($"Line {i.ToString()}: Variable declaration incorrect."); return; }
-
-                    string value = "";
-
-                    if (tokens[4].Contains("("))
-                    {
-                        string funcName = tokens[4].Split("(")[0];
-                        for (int j = 0; j < functions.Length; j++)
-                        {
-
-                        }
-                    }
-
-                    if (tokens[4].StartsWith("\"") && tokens.Last().EndsWith("\"") && newType == varType.stri) // String
-                    {
-                        tokens[4].Remove(0, 1);
-                        tokens.Last().Remove(tokens.Last().Length - 2, 1);
-
-                        for (int j = 4; j < tokens.Length - 5; j++)
-                        {
-                            value += tokens[j];
-                        }
-                    }
-                    else if (newType == varType.floa && float.TryParse(tokens[4], out _)) // Float
-                    {
-                        value = tokens[4];
-                    }
-                    else if (newType == varType.inte && int.TryParse(tokens[4], out _)) // Int
-                    {
-                        value = tokens[4];
-                    }
-                    else
-                    {
-                        Globals.WriteError($"Line {i.ToString()}: Variable assignment does not match specified type.");
-                        return;
-                    }
-
-                    variables.Add(new Variable(name, newType, value));
-                }
-                else if (code[i].StartsWith("Out"))
-                {
-                    string tokens = code[i].Split("(")[0];
-
-                }
-                else
-                {
-
+                        break;
                 }
             }
+
+            return 0;
         }
 
-        static string[]? PreProcess(List<string> unProcessedCode)
+        static string[] FormatCode(File code)
         {
-            if (unProcessedCode[0] == "#add<STDIO>")
+            List<string> noWhiteSpaceFile = new List<string>();
+
+            for (int i = 0; i < code.content.Count(); i++)
             {
-                List<string>? STDIO = GetSTDIO();
-                if (STDIO == null) return null;
+                if (string.IsNullOrWhiteSpace(code.content[i])) continue; //Removes empty lines
+                if (code.content[i].Trim().StartsWith("//")) continue;    //Removes one line comments
 
-                List<string> userCode = unProcessedCode;
+                // Removes end of line comments
+                string toAdd = code.content[i].Trim();
+                int indexOfComment = toAdd.IndexOf("//");
+                if (indexOfComment != -1) { toAdd = toAdd.Remove(indexOfComment); }
 
-                unProcessedCode = STDIO;
-                unProcessedCode.AddRange(userCode);
-            }
-            for (int i = 0; i < unProcessedCode.Count(); i++)
-            {
-                for (int j = 0; j < unProcessedCode[i].Length; j++)
-                {
-                    if (unProcessedCode[i][j] == '/' && unProcessedCode[i][j + 1] == '/')
-                    {
-                        unProcessedCode[i] = unProcessedCode[i].Remove(i);
-                    }
-                }
-
-                if (string.IsNullOrWhiteSpace(unProcessedCode[i]))
-                {
-                    unProcessedCode.RemoveAt(i);
-                    i--;
-                }
-
-                unProcessedCode[i].TrimStart();
-
+                noWhiteSpaceFile.Add(toAdd);
             }
 
-            return unProcessedCode.ToArray();
+            return noWhiteSpaceFile.ToArray();
         }
-
-        static Function[]? DetectFunctions(string[] code)
+        static Variable? CreateVariable(string[] tokens)
         {
-            List<Function> functions = new List<Function>();
+            string name = tokens[2];
+            string type = tokens[1];
 
-            for (int i = 0; i < code.Length; i++)
+            // Concatenates value
+            string[] valueI = tokens.Skip(4).ToArray();
+            string? value;
+            if (valueI.Length > 1)
             {
-                if (code[i].StartsWith("func"))
-                {
-                    string[] splitLine = code[i].Split(" ");
-
-                    string returnType = splitLine[1];
-
-                    string name = "";
-                    int index = splitLine[2].IndexOf("(");
-                    if (index >= 0) { name = splitLine[2].Substring(0, index); }
-                    else { Globals.WriteError($"Line {i.ToString()}: Function declaration incorrect."); return null; }
-
-                    if (name.Contains("/") | name.Contains(")") | name.Contains(".") | name.Contains(","))
-                    {
-                        Globals.WriteError($"Line {i.ToString()}: Function name cannot contain /).,");
-                        return null;
-                    }
-
-                    for (int j = 0; j < functions.Count(); j++)
-                    {
-                        if (functions[j].name == name) { Globals.WriteError($"Line {i.ToString()}: Function name already taken."); return null; }
-                    }
-
-                    int start = i;
-                    int lenght = 0;
-                    for (int j = i; j < code.Length; j++)
-                    {
-                        if (code[j] == "func END")
-                        {
-                            lenght = j;
-                            i = j;
-                            break;
-                        }
-                    }
-                    if (lenght == 0) { Globals.WriteError($"Line {i.ToString()}: Function never closed."); return null; }
-
-                    functions.Add(new Function(name, returnType, start, lenght));
-                }
+                value = string.Join(" ", valueI);
+            }
+            else if (valueI.Length < 1) return null;
+            else
+            {
+                value = valueI[0];
             }
 
-            return functions.ToArray();
+            Variable? newVar = null;
+
+            // Determines type and creates variable
+            switch (type)
+            {
+                case "string":
+                    value = ParseString(value);
+                    if (value == null) return null;
+
+                    newVar = new Variable<string>(name, value);
+                    break;
+
+                case "int":
+                    if (!Int32.TryParse(value, out int intValue)) return null;
+
+                    newVar = new Variable<int>(name, intValue);
+
+                    break;
+
+                case "float":
+                    if (!float.TryParse(value, out float floatValue)) return null;
+
+                    newVar = new Variable<float>(name, floatValue);
+
+                    break;
+
+                case "bool":
+                    if (!ParseBool(value, out bool boolValue)) return null;
+
+                    newVar = new Variable<bool>(name, boolValue);
+
+                    break;
+
+
+                default: return null;
+            }
+
+            return newVar;
         }
 
-        static List<string>? GetSTDIO()
+        #region parsing
+        static string? ParseString(string input)
         {
-            File? STDIOFile = Globals.rootDirectory.FindFileInChildren("STDIO.cod");
-            if (STDIOFile == null) { Globals.WriteError("\"STDIO.cod\" is missing at root directory."); return null; }
-            return STDIOFile.content;
+            if (!input.StartsWith("\"") || !input.EndsWith("\"")) { Globals.WriteError("Variable assignment invalid."); return null; }
+            if (input.Substring(1, input.Length - 2).Contains("\"")) { Globals.WriteError("Variable assignment invalid."); return null; }
+
+            return input.Substring(1, input.Length - 2);
         }
+
+        static bool ParseBool(string input, out bool result)
+        {
+            if (input == "true")
+            {
+                result = false;
+                return true;
+            }
+            else if (input == "false")
+            {
+                result = false;
+                return true;
+            }
+            else
+            {
+                result = false;
+                return false;
+            }
+        }
+        #endregion parsing
     }
 }

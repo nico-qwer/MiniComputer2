@@ -38,14 +38,24 @@ namespace MiniComputer2
             for (int i = 0; i < Globals.programsDirectory.files.Count(); i++)
             {
                 if (Globals.programsDirectory.files[i].name == name) continue;
-                if (Globals.programsDirectory.files[i].type != "exe") Interpreter.Run(Globals.programsDirectory.files[i], arguments);
+                if (Globals.programsDirectory.files[i].type != "exe")
+                {
+                    int ErrorCode = Interpreter.Run(Globals.programsDirectory.files[i], arguments);
+                    if (ErrorCode != 0) { Globals.WriteError($"Program exited with error code of {ErrorCode.ToString()}."); }
+                }
+
                 return;
             }
             Directory currentDir = Globals.currentPath.Last();
             for (int i = 0; i < currentDir.files.Count(); i++)
             {
                 if (currentDir.files[i].name == name) continue;
-                if (currentDir.files[i].type != "exe") Interpreter.Run(currentDir.files[i], arguments);
+                if (currentDir.files[i].type != "exe")
+                {
+                    int ErrorCode = Interpreter.Run(currentDir.files[i], arguments);
+                    if (ErrorCode != 0) { Globals.WriteError($"Program exited with error code of {ErrorCode.ToString()}."); }
+                }
+
                 return;
             }
         }
